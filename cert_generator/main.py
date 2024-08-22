@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 import io
-from send_mail import Mailer
+import os
+from send_mail import send_mail
 
 
 def add_text_to_image(image, fullname, track=None):
@@ -86,9 +87,8 @@ def main():
             )
 
             def send_certificate(email, fullname):
-                mailer = Mailer()
                 message = f"Dear {fullname},\n\nWe are pleased to inform you that you have successfully completed the AIROL x BLSC Bootcamp. Attached is your certificate of completion.\n\nBest Regards,\nAIROL x BLSC Bootcamp"
-                mailer.send_mail(
+                send_mail(
                     recipient=email,
                     subject="Certificate of Completion",
                     body=message,

@@ -69,8 +69,9 @@ def main():
 
         fullname = st.text_input("Enter fullname:")
         track = category
+        email = st.text_input("Enter email:")
 
-        if fullname and track:
+        if fullname and track and email:
             modified_image = add_text_to_image(image, fullname, track=track)
             st.image(modified_image, caption="Modified Image")
             # download the modified image as pdf
@@ -84,9 +85,24 @@ def main():
                 mime="application/pdf",
             )
 
+            def send_certificate(email, fullname):
+                mailer = Mailer()
+                message = f"Dear {fullname},\n\nWe are pleased to inform you that you have successfully completed the AIROL x BLSC Bootcamp. Attached is your certificate of completion.\n\nBest Regards,\nAIROL x BLSC Bootcamp"
+                mailer.send_mail(
+                    recipient=email,
+                    subject="Certificate of Completion",
+                    body=message,
+                    attachment=f"{fullname}.pdf",
+                )
+                st.toast(f"Certificate sent to {email} successfully.")
+
+            st.button(
+                "Send Certificate",
+                on_click=send_certificate(email=email, fullname=fullname),
+            )
+
     upload_recipient()
-    mailer = Mailer()
-    print(f"{str(mailer)}")
+    # print(f"{str(mailer)}")
 
 
 if __name__ == "__main__":

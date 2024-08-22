@@ -1,37 +1,32 @@
-import mailerlite as MailerLite
+import resend
 import os
 
 
 class Mailer:
-
     def __init__(self):
-        self.client = MailerLite.Client({"api_key": os.getenv("MAILER_API_KEY")})
+        self.resend = resend
+        self.resend.api_key = os.environ["RESEND_API_KEY"]
 
-        self.client.groups.create("AIRLAB-BLSC Bootcamp 2024")
+    def send_mail(self, recipient, subject, body, attachment):
+        body = f"""
+                <p>Dear Attendee,</p>
+                <p>Congratulations on completing the course. attached  is your certificate.</p>
+                <p>Best regards,</p>
+                <p>AIRLAB x BLSC Foundation</p>
+            """
 
-    def send_mail(
-        self,
-        recipient,
-        message,
-        sender="airolunilag@gmail.com",
-    ):
-        params = {
-            "name": "Certificate Distribution",
-            "language_id": 1,
-            "type": "regular",
-            "emails": [
+        params: resend.Emails.SendParams = {
+            "from": "Acme <onboarding@resend.dev>",
+            "to": [recipient],
+            "subject": subject,
+            "html": body,
+            "attachments": [
                 {
-                    "subject": "Certificate of completion",
-                    "from_name": "AIROL x BLSC Bootcamp ",
-                    "from": recipient,
-                    "content": message,
+                    "filename": attachment,
+                    "content": "base64_encoded_pdf",
+                    "type": "application/pdf",
                 }
             ],
         }
 
-        self.client.campaigns.create(params)
-
-    def add_to_group(self, email, fullname, track):
-        self.client.subscribers.create(
-            email, fields={"fullname": fullname, "track": track}
-        )
+        return resend.Emails.send(params)
